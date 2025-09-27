@@ -114,10 +114,14 @@
                     let data = new FormData()
                     data.set("my_image", image)
                     data.set("colorblindnessType", currentColorblindnessType)
-                    fetch('/uploads', {
+             
+                    const res = fetch('/uploads', {
                         method: 'POST',
                         body: data
                     })
+                    .then(x => x.text())
+                    .then(data => console.log(data))
+                  
                 };
             }
             
