@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <style>
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    "Segoe UI",
+                    Roboto;
+                width: 260px;
+                padding: 12px;
+            }
+            select,
+            button {
+                width: 100%;
+                margin-top: 8px;
+                padding: 8px;
+                font-size: 14px;
+            }
+            label {
+                font-weight: 600;
+                font-size: 13px;
+            }
+        </style>
+    </head>
+    <body>
+        <label for="type">Color-blindness type</label>
+        <select id="type">
+            <option value="none">None (off)</option>
+            <option value="protanopia">Protanopia</option>
+            <option value="deuteranopia">Deuteranopia</option>
+            <option value="tritanopia">Tritanopia</option>
+            <option value="protanomaly">Protanomaly</option>
+            <option value="deuteranomaly">Deuteranomaly</option>
+            <option value="tritanomaly">Tritanomaly</option>
+            <option value="achromatopsia">Achromatopsia (monochrome)</option>
+            <option value="achromatomaly">Achromatomaly (reduced color)</option>
+            <!-- add or remove options to match functions available in your color-blind.js -->
+        </select>
+        <button id="apply">Apply to current tab</button>
+        <script src="popup.js"></script>
+    </body>
+</html>

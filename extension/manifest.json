@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "ColorFind",
+  "version": "1.0",
+  "description": "Simulate/adjust colors for different types of color-blindness",
+  "permissions": ["storage", "scripting", "activeTab"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["color-blind.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
