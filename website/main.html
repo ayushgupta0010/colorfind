@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            :root{
+                --primary-color: #95d6a8;
+            }
+
+            html{
+                background-color: var(--primary-color);
+            }
+
+            html, body{
+                height: 120%;
+                font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+            }
+
+            div{
+                background-color: rgb(0, 0, 0, 0.25);
+                padding: 2.5%;
+                border-radius: 20px;
+                border: 1px solid black;
+                box-shadow: 1px 1px black;
+            }
+
+            .main{
+                margin: 2% 5%;
+                height: 90%;
+                display: flex;
+                text-align: center;
+                flex-direction: column;
+            }
+
+            .inputs{
+                display: flex;
+                flex-direction: row;
+                flex: 1 1 0;
+                justify-content: space-between;
+            }
+
+            .pictureSelect{
+                flex-direction: column;
+                display: flex;
+                width: 65%;
+            }
+
+            .settings{
+                width: 20%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .submitButton{
+                font-size: 150%;
+            }
+
+            .selectColorblindness{
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                height: 100%;
+            }
+
+            .colorSelector{
+                bottom: 0;
+                left: 0;
+                position: static;
+            }
+
+            .active{
+                border: 3px solid red;
+            }
+
+            input[type="file"], input[type="submit"], button{
+                padding: 2.5%;
+                background-color: rgba(255, 255, 255, 0.25);
+                margin: 5% 1%;
+                border-radius: 20px;
+                cursor: pointer;
+                border: 1px solid black;
+            }
+
+            #preview{
+                height: 250px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #fileInput{
+                padding: 2.5%;
+                background-color: rgba(255, 255, 255, 0.25);
+                margin: 0;
+                margin-top: 5%;
+            }
+            
+        </style>
+        <script>
+            let currentColorblindnessType = null;
+            let currentColorblindnessInput = null;
+            let image = null;
+
+            function onLoad(){
+                const root = document.documentElement
+                const style = getComputedStyle(root)
+                const primaryColor = style.getPropertyValue("--primary-color")
+                document.getElementById("colorSelector").value = primaryColor
+                
+                document.getElementById('formInput').onsubmit = function(event) {
+                    event.preventDefault(); 
+                    image = document.getElementById("fileInput").files[0]
+                    if(!currentColorblindnessType){alert("Please choose a colorblindness type!"); return}
+                    if(!image){alert("Please select an image!"); return}
+
+                    let data = new FormData()
+                    data.set("my_image", image)
+                    data.set("colorblindnessType", currentColorblindnessType)
+                    fetch('/uploads', {
+                        method: 'POST',
+                        body: data
+                    })
+                };
+            }
+            
+            function sendDaltonizeRequest(e){
+                console.log(e)
+                e.preventDefault()
+            }
+
+            function changePreview(files){
+                for(let file of files){
+                    let src = URL.createObjectURL(file)
+                    document.getElementById("preview").src = src
+                }
+            }
+            
+            function changeCBType(input){
+                if(currentColorblindnessInput){
+                    currentColorblindnessInput.classList.remove("active")
+                }
+
+                currentColorblindnessInput = input
+                currentColorblindnessType = input.innerHTML
+
+                currentColorblindnessInput.classList.add("active")
+            }
+
+            function changeBGColor(input){
+                let color = input.value
+                document.getElementsByTagName("html")[0].style.backgroundColor = color
+            }
+
+        </script>
+    </head>
+    <body onload="onLoad()">
+        <input type="color" id="colorSelector" class="colorSelector" onchange="changeBGColor(this)">
+        <form id="formInput" action="/uploads" method="POST" enctype="multipart/form-data">
+            <div class="main">
+                <h1>ColorFind</h1>
+                <main class="inputs">
+                    <div class="pictureSelect">
+                        <img id="preview"/>
+                        <input name="my_image" id="fileInput" onchange="changePreview(this.files)" accept="image/*" type="file">
+                    </div>
+                    <div class="settings">
+                        <h2>Select Your Colorblindness Type</h2>
+                        <section class="selectColorblindness">
+                            <button type="button" onclick="changeCBType(this)" style="background-color: lightpink;">Protan</button>
+                            <button type="button" onclick="changeCBType(this)" style="background-color: lightgreen;">Deutan</button>
+                            <button type="button" onclick="changeCBType(this)" style="background-color: lightblue;">Tritan</button>
+                        </section>
+                    </div>
+                </main>
+                <input value="Convert Image" class="submitButton" type="submit">
+            </div>
+        </form>
+    </body>
+</html>
