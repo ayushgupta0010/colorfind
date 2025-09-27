@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, url_for
 from werkzeug.utils import secure_filename
-from . import daltonize
+import daltonize
 import os
 from PIL import Image
 
