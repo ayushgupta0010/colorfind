@@ -29,4 +29,5 @@ def upload():
 
     return url_for("static", filename=newFile)
 
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
