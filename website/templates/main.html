@@ -3,7 +3,7 @@
     <head>
         <style>
             :root{
-                --primary-color: #95d6a8;
+                --primary-color: #95a8d6;
             }
 
             html{
@@ -13,6 +13,11 @@
             html, body{
                 height: 120%;
                 font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+            }
+
+            img{
+                max-height: 100%;
+                max-width: 100%
             }
 
             div{
@@ -25,7 +30,6 @@
 
             .main{
                 margin: 2% 5%;
-                height: 90%;
                 display: flex;
                 text-align: center;
                 flex-direction: column;
@@ -52,6 +56,8 @@
 
             .submitButton{
                 font-size: 150%;
+                width: 100%;
+                margin: 5% 0px;
             }
 
             .selectColorblindness{
@@ -71,26 +77,41 @@
                 border: 3px solid red;
             }
 
-            input[type="file"], input[type="submit"], button{
+            input[type="file"], input[type="submit"], button, p, a{
                 padding: 2.5%;
                 background-color: rgba(255, 255, 255, 0.25);
-                margin: 5% 1%;
                 border-radius: 20px;
                 cursor: pointer;
                 border: 1px solid black;
+                box-shadow: 1px 1px black;
             }
 
-            #preview{
+            a{
+                text-decoration: none;
+                color: black;
+            }
+
+            .preview{
                 height: 250px;
                 margin-left: auto;
                 margin-right: auto;
             }
 
-            #fileInput{
+            .fileInput{
                 padding: 2.5%;
                 background-color: rgba(255, 255, 255, 0.25);
                 margin: 0;
                 margin-top: 5%;
+            }
+
+            .side2side{
+                display: flex; 
+                flex-direction: row; 
+                justify-content: space-between;
+            }
+
+            .hidden{
+                display: none;
             }
             
         </style>
@@ -120,9 +141,22 @@
                         body: data
                     })
                     .then(x => x.text())
-                    .then(data => console.log(data))
+                    .then(data => showOutput(data))
                   
                 };
+            }
+
+            function showOutput(imgPath){
+                let outputDiv = document.getElementById("outputDiv")
+                if(outputDiv.classList.contains("hidden")){
+                    outputDiv.classList.remove("hidden")
+                }
+
+                let outputImg = document.getElementById("outputImage")
+                outputImg.src = imgPath
+
+                let outputImageLink = document.getElementById("outputImageLink")
+                outputImageLink.href = imgPath
             }
             
             function sendDaltonizeRequest(e){
@@ -131,10 +165,13 @@
             }
 
             function changePreview(files){
-                for(let file of files){
-                    let src = URL.createObjectURL(file)
-                    document.getElementById("preview").src = src
-                }
+                let file = files[0]
+                let src = URL.createObjectURL(file)
+                document.getElementById("preview").src = src
+                let sizeShower = document.getElementById("sizeShower")
+                let size = file["size"]
+                sizeShower.innerHTML = `Size: ${returnFileSize(size)}`
+            
             }
             
             function changeCBType(input){
@@ -153,17 +190,29 @@
                 document.getElementsByTagName("html")[0].style.backgroundColor = color
             }
 
+            function returnFileSize(number) { // thank you https://developer.mozilla.org
+                if (number < 1e3) {
+                    return `${number} bytes`;
+                } else if (number >= 1e3 && number < 1e6) {
+                    return `${(number / 1e3).toFixed(1)} KB`;
+                }
+                return `${(number / 1e6).toFixed(1)} MB`;
+            }
+
         </script>
     </head>
     <body onload="onLoad()">
         <input type="color" id="colorSelector" class="colorSelector" onchange="changeBGColor(this)">
-        <form id="formInput" action="/uploads" method="POST" enctype="multipart/form-data">
-            <div class="main">
-                <h1>ColorFind</h1>
+        <div class="main">
+            <h1>ColorFind</h1>
+            <form id="formInput" action="/uploads" method="POST" enctype="multipart/form-data">
                 <main class="inputs">
                     <div class="pictureSelect">
-                        <img id="preview"/>
-                        <input name="my_image" id="fileInput" onchange="changePreview(this.files)" accept="image/*" type="file">
+                        <img class="preview" id="preview"/>
+                        <section class="side2side">
+                            <input name="my_image" class="fileInput" id="fileInput" onchange="changePreview(this.files)" style="width: 70%" accept="image/*" type="file">
+                            <p style="width: 15%" class="fileInput" id="sizeShower"></p>
+                        </section>
                     </div>
                     <div class="settings">
                         <h2>Select Your Colorblindness Type</h2>
@@ -175,7 +224,14 @@
                     </div>
                 </main>
                 <input value="Convert Image" class="submitButton" type="submit">
+            </form>
+            <div id="outputDiv" class="hidden">
+                <h2>Output</h2>
+                <img id="outputImage" class="preview">
+                <section class="side2side" style="justify-content: center;">
+                    <a download id="outputImageLink">Click here to download image!</a>
+                </section>
             </div>
-        </form>
+        </div>
     </body>
 </html>
