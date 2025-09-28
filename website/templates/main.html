@@ -6,13 +6,14 @@
                 --primary-color: #95a8d6;
             }
 
-            html{
-                background-color: var(--primary-color);
+            html, body{
+                min-height: 100;
+                font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
             }
 
-            html, body{
-                height: 120%;
-                font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif
+            html{
+                background-color: var(--primary-color);
+                background: linear-gradient(to bottom,var(--primary-color) 0%, rgb(0, 0, 0, 0.75) 100%);
             }
 
             img{
@@ -84,6 +85,11 @@
                 cursor: pointer;
                 border: 1px solid black;
                 box-shadow: 1px 1px black;
+                transition: .5s all
+            }
+
+            input[type="file"]:hover, input[type="submit"]:hover, button:hover, a:hover{
+                background-color: rgba(255, 255, 255, 0.15);
             }
 
             a{
@@ -119,6 +125,7 @@
             let currentColorblindnessType = null;
             let currentColorblindnessInput = null;
             let image = null;
+            let intervals = []
 
             function onLoad(){
                 const root = document.documentElement
@@ -144,6 +151,8 @@
                     .then(data => showOutput(data))
                   
                 };
+
+                changeColorColors()
             }
 
             function showOutput(imgPath){
@@ -157,11 +166,6 @@
 
                 let outputImageLink = document.getElementById("outputImageLink")
                 outputImageLink.href = imgPath
-            }
-            
-            function sendDaltonizeRequest(e){
-                console.log(e)
-                e.preventDefault()
             }
 
             function changePreview(files){
@@ -187,7 +191,96 @@
 
             function changeBGColor(input){
                 let color = input.value
-                document.getElementsByTagName("html")[0].style.backgroundColor = color
+                let html = document.getElementsByTagName("html")[0]
+                html.style.backgroundColor = color
+                html.style.background = `linear-gradient(to bottom,${color} 0%, rgb(0, 0, 0, 0.75) 100%);`
+                
+            }
+
+            function changeColorColors(){
+                // red green blue purple orange yellow
+
+                let colors = [
+                    "#FF2424",
+                    "#24FF41",
+                    "#2824FF",
+                    "#B624FF",
+                    "#FFA024",
+                    "#FFF824"
+                ]
+
+                colors.reverse()
+
+                let colorsLength = colors.length
+
+                let C = 4
+                let O = 3
+                let l = 2
+                let o = 1
+                let R = 0
+
+                let time = 200     
+                
+                intervals.push(setInterval(function(){
+                    if(R == colorsLength){
+                        R = 0
+                    }
+                    document.getElementById("R").style.color = colors[R]
+                    R++
+                }, time))
+                
+                intervals.push(setInterval(function(){
+                    if(o == colorsLength){
+                        o = 0
+                    }
+                    document.getElementById("o").style.color = colors[o]
+                    o++
+                }, time))
+                
+                intervals.push(setInterval(function(){
+                    if(l == colorsLength){
+                        l = 0
+                    }
+                    document.getElementById("L").style.color = colors[l]
+                    l++
+                }, time))
+
+                intervals.push(setInterval(function(){
+                    if(O == colorsLength){
+                        O = 0
+                    }
+                    document.getElementById("O").style.color = colors[O]
+                    O++
+                }, time)) 
+
+                intervals.push(setInterval(function(){
+                    if(C == colorsLength){
+                        C = 0
+                    }
+                    document.getElementById("C").style.color = colors[C]
+                    C++
+                }, time))     
+            }
+
+            function changeFun(html){
+                let isFun = html.classList.contains("fun")
+                if(isFun){
+                    html.classList.remove("fun") // thanks ayush
+                    html.src = "https://img.favpng.com/10/13/15/emoji-smiley-emoticon-blank-expression-feeling-png-favpng-QG1nN4Gb5usaMCEwPnezutaGr.jpg"
+                    for(interval of intervals){
+                        clearInterval(interval)
+                        document.getElementById("C").style.color = "black"
+                        document.getElementById("O").style.color = "black"
+                        document.getElementById("L").style.color = "black"
+                        document.getElementById("o").style.color = "black"
+                        document.getElementById("R").style.color = "black"
+                    }
+                }
+                else{
+                    html.classList.add("fun") // oh yeah
+                    html.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3n7RJsVjb1dCE8z44G-pM0V8HQQyWATW3CQ&s"
+                    changeColorColors()
+                }
             }
 
             function returnFileSize(number) { // thank you https://developer.mozilla.org
@@ -203,8 +296,9 @@
     </head>
     <body onload="onLoad()">
         <input type="color" id="colorSelector" class="colorSelector" onchange="changeBGColor(this)">
+        <img style="margin-bottom: -20px; width: 50px; height: 50px; top: 50px; left: 150px; position: static; cursor: pointer;" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3n7RJsVjb1dCE8z44G-pM0V8HQQyWATW3CQ&s" onclick="changeFun(this)" class="fun" id="funSelector"></img>
         <div class="main">
-            <h1>ColorFind</h1>
+            <h1 style="font-size: 300%; margin-top: 0px;"><span id="C">C</span><span id="O">o</span><span id="L">l</span><span id="o">o</span><span id="R">r</span><span>Find</span></h1>
             <form id="formInput" action="/uploads" method="POST" enctype="multipart/form-data">
                 <main class="inputs">
                     <div class="pictureSelect">
@@ -221,6 +315,8 @@
                             <button type="button" onclick="changeCBType(this)" style="background-color: lightgreen;">Deutan</button>
                             <button type="button" onclick="changeCBType(this)" style="background-color: lightblue;">Tritan</button>
                         </section>
+                        <hr style="width: 100%">
+                        <a href="https://enchroma.com/pages/color-blindness-test" style="padding: .5%; border-radius: 0px" target="_blank">Don't know what you are? Take Colorblindness Test!</a>
                     </div>
                 </main>
                 <input value="Convert Image" class="submitButton" type="submit">
